@@ -34,7 +34,7 @@ export default function Home() {
 
               <button 
               className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700">
-                Request Emergency Help
+                Request Emergency
               </button>
 
               <button 
