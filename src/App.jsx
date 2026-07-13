@@ -3,6 +3,8 @@ import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./home/Page";
 import Mechanics from "./mechanics/Page";
+import Services from "./services/Page";
+
 
 
 
@@ -18,6 +20,8 @@ function App() {
 
         <Route path="/" element={<Home />}/>
         <Route path="/mechanics" element={<Mechanics />}/>
+        <Route path="/services" element={<Services />}/>
+       
       </Routes>
 
     </>
