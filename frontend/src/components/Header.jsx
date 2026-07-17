@@ -1,6 +1,10 @@
 import React from "react";
+import Login from "./Login";
 
 export default function Header() {
+
+  const [showLogin, setShowLogin] = React.useState(false);
+
   return (
     <header className="w-full bg-white shadow-md">
       <div className="container mx-auto flex items-center justify-between px-8 py-4">
@@ -49,9 +53,12 @@ export default function Header() {
         {/* Buttons */}
         <div className="flex items-center gap-4">
 
-          <button className="hidden md:block text-gray-700 hover:text-blue-600">
+          <button 
+          onClick={() => setShowLogin(true)}
+          className="hidden md:block text-gray-700 hover:text-blue-600">
             Login
           </button>
+          <Login isOpen={showLogin} onClose={() => setShowLogin(false)} />
 
           <button className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition">
             Get Started

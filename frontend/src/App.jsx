@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Home from "./home/Page";
 import Mechanics from "./mechanics/Page";
 import Services from "./services/Page";
+import Login from "./components/Login";
 
 
 
@@ -15,12 +16,14 @@ function App() {
 
     <>
       <Header />
+      
 
       <Routes>
 
         <Route path="/" element={<Home />}/>
         <Route path="/mechanics" element={<Mechanics />}/>
         <Route path="/services" element={<Services />}/>
+        
        
       </Routes>
 
