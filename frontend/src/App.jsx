@@ -5,6 +5,7 @@ import Home from "./home/Page";
 import Mechanics from "./mechanics/Page";
 import Services from "./services/Page";
 import Login from "./components/Login";
+import About from "./about/Page";
 
 
 
@@ -23,7 +24,7 @@ function App() {
         <Route path="/" element={<Home />}/>
         <Route path="/mechanics" element={<Mechanics />}/>
         <Route path="/services" element={<Services />}/>
-        
+        <Route path="/about" element={<About />}/>
        
       </Routes>
 
