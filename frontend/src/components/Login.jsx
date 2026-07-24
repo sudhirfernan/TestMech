@@ -64,11 +64,11 @@ function Login({ isOpen, onClose }) {
           <div>
 
             <label className="text-sm text-gray-700">
-              Email Address
+              Username
             </label>
 
             <input
-              type="email"
+              type="string"
               placeholder="Enter your email"
               className="
               w-full mt-2
