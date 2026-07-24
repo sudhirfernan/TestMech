@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { LoginDto } from './dto/login.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { LoginDto } from './dto/user.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-    login(loginDto: LoginDto){
-        const { email, password } = loginDto;
+    constructor(private readonly usersService: UsersService) {}
 
-        return{
-            message: 'Login successful',
-            email: email,
-            password: password
-        };
-}
+    async signIn(username: string, password: string): Promise<any>{
+        const user = await this.usersService.findOne(username);
+        if(user?.password === password){
+            throw new UnauthorizedException('Invalid credentials');
+        }
+
+        const { pass, ...result } = user;
+        return result;
+    }
 }
