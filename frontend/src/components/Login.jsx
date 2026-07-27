@@ -1,9 +1,53 @@
 import { useState } from "react";
 
-function Login({ isOpen, onClose }) {
+const API_BASE_URL = "http://localhost:3000"; // update if your backend runs elsewhere
+
+function Login({ isOpen, onClose, onLoginSuccess, onSwitchToRegister }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   if (!isOpen) return null;
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!username || !password) {
+      setError("Please enter both username and password.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // NestJS error responses typically include a "message" field
+        throw new Error(data.message || "Invalid username or password.");
+      }
+
+      // Expecting { access_token: string } from AuthService.signIn()
+      localStorage.setItem("access_token", data.access_token);
+
+      setIsLoading(false);
+      onLoginSuccess?.(data);
+      onClose();
+    } catch (err) {
+      setIsLoading(false);
+      setError(err.message || "Something went wrong. Please try again.");
+    }
+  };
 
   return (
     <div
@@ -14,7 +58,6 @@ function Login({ isOpen, onClose }) {
       z-50
       "
     >
-
       {/* Modal */}
       <div
         className="
@@ -26,7 +69,6 @@ function Login({ isOpen, onClose }) {
         relative
         "
       >
-
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -41,35 +83,31 @@ function Login({ isOpen, onClose }) {
           ×
         </button>
 
-
         {/* Header */}
         <div className="text-center">
-
-          <h2 className="text-3xl font-bold text-gray-900">
-            Welcome Back
-          </h2>
-
+          <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
           <p className="mt-2 text-gray-500">
             Login to access mechanic assistance
           </p>
-
         </div>
 
-
+        {/* Error message */}
+        {error && (
+          <div className="mt-5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+            {error}
+          </div>
+        )}
 
         {/* Form */}
-        <form className="mt-8 space-y-5">
-
-
+        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           <div>
-
-            <label className="text-sm text-gray-700">
-              Username
-            </label>
-
+            <label className="text-sm text-gray-700">Username</label>
             <input
-              type="string"
-              placeholder="Enter your email"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
+              disabled={isLoading}
               className="
               w-full mt-2
               border border-gray-300
@@ -78,22 +116,19 @@ function Login({ isOpen, onClose }) {
               focus:outline-none
               focus:ring-2
               focus:ring-blue-500
+              disabled:bg-gray-100
               "
             />
-
           </div>
 
-
-
           <div>
-
-            <label className="text-sm text-gray-700">
-              Password
-            </label>
-
+            <label className="text-sm text-gray-700">Password</label>
             <input
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
+              disabled={isLoading}
               className="
               w-full mt-2
               border border-gray-300
@@ -102,23 +137,16 @@ function Login({ isOpen, onClose }) {
               focus:outline-none
               focus:ring-2
               focus:ring-blue-500
+              disabled:bg-gray-100
               "
             />
-
           </div>
 
-
-
           <div className="flex justify-between items-center">
-
             <label className="flex items-center gap-2 text-sm">
-
               <input type="checkbox" />
-
               Remember me
-
             </label>
-
 
             <button
               type="button"
@@ -130,13 +158,11 @@ function Login({ isOpen, onClose }) {
             >
               Forgot password?
             </button>
-
-
           </div>
 
-
-
           <button
+            type="submit"
+            disabled={isLoading}
             className="
             w-full
             bg-blue-600
@@ -146,22 +172,19 @@ function Login({ isOpen, onClose }) {
             font-semibold
             hover:bg-blue-700
             transition
+            disabled:opacity-60
+            disabled:cursor-not-allowed
             "
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </button>
-
-
         </form>
-
-
 
         {/* Register */}
         <p className="text-center mt-6 text-gray-600">
-
           Don't have an account?
-
           <button
+            onClick={onSwitchToRegister}
             className="
             ml-2
             text-blue-600
@@ -171,16 +194,10 @@ function Login({ isOpen, onClose }) {
           >
             Register
           </button>
-
         </p>
-
-
       </div>
-
-
     </div>
   );
 }
-
 
 export default Login;
