@@ -4,7 +4,7 @@ import Header from "./components/Header";
 import Home from "./home/Page";
 import Mechanics from "./mechanics/Page";
 import Services from "./services/Page";
-import Login from "./components/Login";
+import Login from "./components/SignUp";
 import About from "./about/Page";
 
 

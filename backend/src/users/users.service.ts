@@ -11,13 +11,13 @@ export class UsersService {
         @InjectRepository(User) private readonly usersRepository: Repository<User>
     ) {}
 
-    async findOne(username: string): Promise<User | undefined> {
-        const user = await this.usersRepository.findOne({ where: { username } });
+    async findOne(email: string): Promise<User | undefined> {
+        const user = await this.usersRepository.findOne({ where: { email } });
         return user ?? undefined;
     }
 
-    async create(username:string , password:string): Promise<User> {
-        const user = this.usersRepository.create({ username, password });
+    async create(email: string, password: string): Promise<User> {
+        const user = this.usersRepository.create({ email, password });
         return this.usersRepository.save(user);
     }
 }

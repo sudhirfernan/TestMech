@@ -12,9 +12,9 @@ export class AuthController {
    
     @HttpCode(HttpStatus.CREATED)
     @Public()
-    @Post('register')
+    @Post('signup')
     register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto.username, registerDto.password);
+    return this.authService.register(registerDto.email, registerDto.password);
 }
 
     @UseGuards(AuthGuard)
@@ -22,4 +22,12 @@ export class AuthController {
     getprofile(@Request() req) {
         return req.user;
     }
+
+    @HttpCode(HttpStatus.OK)
+    @Public()
+    @Post('login')
+    login(@Body() signInDto: RegisterDto) {
+        return this.authService.signIn(signInDto.email, signInDto.password);
+    }
+    
 }

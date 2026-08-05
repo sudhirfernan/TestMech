@@ -1,8 +1,10 @@
 import React from "react";
+import SignUp from "./SignUp";
 import Login from "./Login";
 
 export default function Header() {
 
+  const [showSignUp, setShowSignUp] = React.useState(false);
   const [showLogin, setShowLogin] = React.useState(false);
 
   return (
@@ -56,13 +58,20 @@ export default function Header() {
           <button 
           onClick={() => setShowLogin(true)}
           className="hidden md:block text-gray-700 hover:text-blue-600">
-            Login
+              Login
           </button>
           <Login isOpen={showLogin} onClose={() => setShowLogin(false)} />
+          
 
-          <button className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition">
-            Get Started
+          <button 
+          onClick={() => setShowSignUp(true)}
+          className="hidden md:block text-gray-700 hover:text-blue-600">
+            Sign Up
           </button>
+          <SignUp isOpen={showSignUp} onClose={() => setShowSignUp(false)} />
+            
+
+          
 
         </div>
 

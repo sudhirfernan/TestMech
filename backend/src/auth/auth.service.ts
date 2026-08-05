@@ -10,27 +10,32 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async register(username: string, password: string) {
-    const existing = await this.usersService.findOne(username);
+    async register(email: string, password: string) {
+    const existing = await this.usersService.findOne(email);
     if (existing) {
-      throw new ConflictException('Username already taken');
+      throw new ConflictException('Email already registered');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await this.usersService.create(username, hashedPassword);
+    const user = await this.usersService.create(email, hashedPassword);
 
-    return { userId: user.userId, username: user.username };
+    return { userId: user.userId, email: user.email };
   }
 
-    async signIn(username: string, password: string): Promise<{access_token: string}>{
-        const user = await this.usersService.findOne(username);
-        if(user?.password !== password){
+    async signIn(email: string, password: string): Promise<{access_token: string}>{
+        const user = await this.usersService.findOne(email);
+        if(!user){
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        const payload =  { sub: user.userId, username: user.username}
-        return {
-            access_token: await this.jwtService.signAsync(payload)
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(!isMatch){
+            throw new UnauthorizedException('Invalid credentials');
         }
+
+        const payload = { email: user.email, sub: user.userId };
+        return {
+            access_token: await this.jwtService.signAsync(payload),
+        };
     }
 }
