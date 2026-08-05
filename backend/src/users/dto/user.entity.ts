@@ -1,4 +1,4 @@
-import { IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
@@ -8,6 +8,10 @@ export class User {
     userId!: number;
 
     @Column({unique: true})
+    @IsEmail()
+    email!: string;
+
+    
     @IsString()
     @MinLength(3)
     username!: string;

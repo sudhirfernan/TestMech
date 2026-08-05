@@ -1,203 +1,151 @@
 import { useState } from "react";
 
-const API_BASE_URL = "http://localhost:3000"; // update if your backend runs elsewhere
-
-function Login({ isOpen, onClose, onLoginSuccess, onSwitchToRegister }) {
-  const [username, setUsername] = useState("");
+export default function LoginPopup({ isOpen, onClose }) {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+
+    setLoading(true);
     setError("");
 
-    if (!username || !password) {
-      setError("Please enter both username and password.");
-      return;
-    }
-
-    setIsLoading(true);
-
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch("http://localhost:3000/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // NestJS error responses typically include a "message" field
-        throw new Error(data.message || "Invalid username or password.");
+        throw new Error(data.message || "Login failed");
       }
 
-      // Expecting { access_token: string } from AuthService.signIn()
-      localStorage.setItem("access_token", data.access_token);
+      // Save JWT token
+      localStorage.setItem("token", data.access_token);
 
-      setIsLoading(false);
-      onLoginSuccess?.(data);
+      alert("Login Successful!");
+
       onClose();
     } catch (err) {
-      setIsLoading(false);
-      setError(err.message || "Something went wrong. Please try again.");
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div
-      className="
-      fixed inset-0
-      bg-black/50
-      flex items-center justify-center
-      z-50
-      "
-    >
-      {/* Modal */}
-      <div
-        className="
-        bg-white
-        w-full max-w-md
-        rounded-2xl
-        p-8
-        shadow-2xl
-        relative
-        "
-      >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="
-          absolute
-          top-4 right-5
-          text-gray-500
-          text-2xl
-          hover:text-gray-900
-          "
-        >
-          ×
+    <div style={styles.overlay}>
+      <div style={styles.popup}>
+        <button style={styles.closeBtn} onClick={onClose}>
+          ✕
         </button>
 
-        {/* Header */}
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="mt-2 text-gray-500">
-            Login to access mechanic assistance
-          </p>
-        </div>
+        <h2 style={{ marginBottom: "20px" }}>Login</h2>
 
-        {/* Error message */}
-        {error && (
-          <div className="mt-5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
-            {error}
-          </div>
-        )}
-
-        {/* Form */}
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-          <div>
-            <label className="text-sm text-gray-700">Username</label>
+        <form onSubmit={handleLogin}>
+          <div style={styles.formGroup}>
+            <label>Email</label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-              disabled={isLoading}
-              className="
-              w-full mt-2
-              border border-gray-300
-              rounded-lg
-              px-4 py-3
-              focus:outline-none
-              focus:ring-2
-              focus:ring-blue-500
-              disabled:bg-gray-100
-              "
+              type="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={styles.input}
             />
           </div>
 
-          <div>
-            <label className="text-sm text-gray-700">Password</label>
+          <div style={styles.formGroup}>
+            <label>Password</label>
             <input
               type="password"
+              placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              disabled={isLoading}
-              className="
-              w-full mt-2
-              border border-gray-300
-              rounded-lg
-              px-4 py-3
-              focus:outline-none
-              focus:ring-2
-              focus:ring-blue-500
-              disabled:bg-gray-100
-              "
+              required
+              style={styles.input}
             />
           </div>
 
-          <div className="flex justify-between items-center">
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" />
-              Remember me
-            </label>
-
-            <button
-              type="button"
-              className="
-              text-blue-600
-              text-sm
-              hover:underline
-              "
-            >
-              Forgot password?
-            </button>
-          </div>
+          {error && (
+            <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>
+          )}
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="
-            w-full
-            bg-blue-600
-            text-white
-            py-3
-            rounded-lg
-            font-semibold
-            hover:bg-blue-700
-            transition
-            disabled:opacity-60
-            disabled:cursor-not-allowed
-            "
+            disabled={loading}
+            style={styles.loginBtn}
           >
-            {isLoading ? "Logging in..." : "Login"}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-
-        {/* Register */}
-        <p className="text-center mt-6 text-gray-600">
-          Don't have an account?
-          <button
-            onClick={onSwitchToRegister}
-            className="
-            ml-2
-            text-blue-600
-            font-semibold
-            hover:underline
-            "
-          >
-            Register
-          </button>
-        </p>
       </div>
     </div>
   );
 }
 
-export default Login;
+const styles = {
+  overlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "rgba(0,0,0,0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  popup: {
+    width: "400px",
+    background: "#fff",
+    padding: "30px",
+    borderRadius: "12px",
+    position: "relative",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+  },
+  closeBtn: {
+    position: "absolute",
+    right: "15px",
+    top: "15px",
+    border: "none",
+    background: "transparent",
+    fontSize: "20px",
+    cursor: "pointer",
+  },
+  formGroup: {
+    marginBottom: "18px",
+    display: "flex",
+    flexDirection: "column",
+  },
+  input: {
+    padding: "10px",
+    marginTop: "6px",
+    borderRadius: "6px",
+    border: "1px solid #ccc",
+    fontSize: "16px",
+  },
+  loginBtn: {
+    width: "100%",
+    padding: "12px",
+    background: "#2563eb",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    fontSize: "16px",
+    cursor: "pointer",
+  },
+};
